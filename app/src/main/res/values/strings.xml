@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">InTroubleApp</string>
+
+    <string name="alert_screen_text">Press in case of trouble</string>
+    <string name="alert_button_description">Alert button</string>
+    <string name="settings_button_description">Settings button</string>
 </resources>

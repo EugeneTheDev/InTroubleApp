@@ -1,4 +1,4 @@
-package com.eugenethedev.introubleapp.presentation
+package com.eugenethedev.introubleapp.presentation.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
