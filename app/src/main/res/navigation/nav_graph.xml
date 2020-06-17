@@ -8,6 +8,15 @@
     <fragment
         android:id="@+id/fragmentAlert"
         android:name="com.eugenethedev.introubleapp.presentation.alert.AlertFragment"
-        tools:layout="@layout/fragment_alert"/>
+        tools:layout="@layout/fragment_alert">
+        <action
+            android:id="@+id/action_fragmentAlert_to_fragmentSettings"
+            app:destination="@id/fragmentSettings"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragmentSettings"
+        android:name="com.eugenethedev.introubleapp.presentation.settings.SettingsFragment"
+        tools:layout="@layout/fragment_settings"/>
 
 </navigation>

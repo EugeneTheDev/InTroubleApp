@@ -4,4 +4,10 @@
     <string name="alert_screen_text">Press in case of trouble</string>
     <string name="alert_button_description">Alert button</string>
     <string name="settings_button_description">Settings button</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="sms_title">SMS</string>
+    <string name="message_text">Message text</string>
+    <string name="receivers">Receivers</string>
+    <string name="add_receiver">ADD RECEIVER</string>
 </resources>

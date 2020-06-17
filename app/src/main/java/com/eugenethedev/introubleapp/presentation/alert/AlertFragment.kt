@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.eugenethedev.introubleapp.R
 import kotlinx.android.synthetic.main.fragment_alert.*
 
@@ -36,6 +37,10 @@ class AlertFragment : Fragment() {
             requestPermissions(arrayOf(Manifest.permission.SEND_SMS), REQUEST_SMS_PERMISSION)
         } else {
             setupSms()
+        }
+
+        settingsButton.setOnClickListener {
+            findNavController().navigate(R.id.action_fragmentAlert_to_fragmentSettings)
         }
     }
 
