@@ -28,6 +28,12 @@ class SettingsFragment : Fragment() {
             it.supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
         }
         setHasOptionsMenu(true)
+
+        val adapter = ReceiversAdapter()
+        receiversList.adapter = adapter
+        addReceiverButton.setOnClickListener {
+            adapter.addNewAddItem()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId) {

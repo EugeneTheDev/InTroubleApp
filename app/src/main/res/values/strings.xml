@@ -10,4 +10,9 @@
     <string name="message_text">Message text</string>
     <string name="receivers">Receivers</string>
     <string name="add_receiver">ADD RECEIVER</string>
+
+    <string name="remove_button_description">Remove button</string>
+    <string name="add_button_description">Add button</string>
+    <string name="name_hint">Name</string>
+    <string name="number_hint">Number</string>
 </resources>
