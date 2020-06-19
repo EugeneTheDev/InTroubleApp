@@ -1,18 +1,21 @@
 package com.eugenethedev.introubleapp.presentation.alert
 
+import android.Manifest
 import android.content.Context
 import android.os.Bundle
 import android.telephony.SmsManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import androidx.navigation.fragment.findNavController
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.eugenethedev.introubleapp.InTroubleApp
 import com.eugenethedev.introubleapp.R
+import com.eugenethedev.introubleapp.presentation.isPermissionGranted
 import kotlinx.android.synthetic.main.fragment_alert.*
 import javax.inject.Inject
 
@@ -24,6 +27,12 @@ class AlertFragment : MvpAppCompatFragment(), AlertView {
 
     @ProvidePresenter
     fun provideAlertPresenter() = alertPresenter
+
+    private val anim = AlphaAnimation(1.0f, 0.0f).also {
+        it.duration = 500
+        it.repeatCount = 1
+        it.repeatMode = Animation.REVERSE
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,16 +53,47 @@ class AlertFragment : MvpAppCompatFragment(), AlertView {
         }
 
         alertButton.setOnClickListener {
-            SmsManager.getDefault()
-                .sendTextMessage(
-                    "+11111111", // some hardcoded number for now
-                    null,
-                    "Hello, world",
-                    null,
-                    null
-                )
-
-            Log.i("Message", "Message sent")
+            alertPresenter.onAlertButtonClick()
         }
+
+        alertPresenter.onCreate()
+    }
+
+    override fun sendMessages(numbers: List<String>, messageText: String) {
+        if (isPermissionGranted(Manifest.permission.SEND_SMS)) {
+            SmsManager.getDefault()?.let { manager ->
+                numbers.forEach {
+                    manager.sendTextMessage(
+                        it, // some hardcoded number for now
+                        null,
+                        messageText,
+                        null,
+                        null
+                    )
+                }
+            }
+        }
+    }
+
+    override fun setAfterAlertText() {
+        alertText.startAnimation(anim)
+        anim.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationEnd(animation: Animation?) { }
+            override fun onAnimationStart(animation: Animation?) { }
+            override fun onAnimationRepeat(animation: Animation?) {
+                alertText.setText(R.string.alert_after_click_text)
+            }
+        })
+    }
+
+    override fun setScreenText() {
+        alertText.startAnimation(anim)
+        anim.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationEnd(animation: Animation?) { }
+            override fun onAnimationStart(animation: Animation?) { }
+            override fun onAnimationRepeat(animation: Animation?) {
+                alertText.setText(R.string.alert_screen_text)
+            }
+        })
     }
 }
