@@ -21,7 +21,9 @@ class SettingsPresenter @Inject constructor(
             viewState.setSmsToggleState(it.isEnabled)
             viewState.setupReceiversList(it.receivers)
             viewState.setMessageText(it.messageText)
+            viewState.setLocationToggleState(it.isLocationEnabled)
         }
+        viewState.makeVisible()
     }
 
     fun onToggleSms(isChecked: Boolean) = launch {
@@ -38,6 +40,10 @@ class SettingsPresenter @Inject constructor(
 
     fun onMessageTextChanged(messageText: String) = launch {
         settingsRepository.changeMessageText(messageText)
+    }
+
+    fun onToggleLocation(isChecked: Boolean) = launch {
+        settingsRepository.toggleLocation(isChecked)
     }
 
     override fun onDestroy() {

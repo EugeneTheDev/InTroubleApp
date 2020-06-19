@@ -12,8 +12,14 @@ interface SettingsView : MvpView {
     fun setSmsToggleState(isChecked: Boolean)
 
     @StateStrategyType(AddToEndSingleStrategy::class)
+    fun setLocationToggleState(isChecked: Boolean)
+
+    @StateStrategyType(AddToEndSingleStrategy::class)
     fun setMessageText(messageText: String)
 
     @StateStrategyType(AddToEndSingleStrategy::class)
     fun setupReceiversList(receivers: RealmList<Receiver>)
+
+    @StateStrategyType(AddToEndSingleStrategy::class)
+    fun makeVisible()
 }

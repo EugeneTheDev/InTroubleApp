@@ -2,6 +2,7 @@ package com.eugenethedev.introubleapp.presentation.alert
 
 import android.Manifest
 import android.content.Context
+import android.location.Location
 import android.os.Bundle
 import android.telephony.SmsManager
 import android.view.LayoutInflater
@@ -34,6 +35,10 @@ class AlertFragment : MvpAppCompatFragment(), AlertView {
         it.repeatMode = Animation.REVERSE
     }
 
+    companion object {
+        private const val GOOGLE_MAP_LINK_TEMPLATE = "https://maps.google.com/?q=%s,%s"
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,14 +64,15 @@ class AlertFragment : MvpAppCompatFragment(), AlertView {
         alertPresenter.onCreate()
     }
 
-    override fun sendMessages(numbers: List<String>, messageText: String) {
+    override fun sendMessages(numbers: List<String>, messageText: String, location: Location?) {
         if (isPermissionGranted(Manifest.permission.SEND_SMS)) {
             SmsManager.getDefault()?.let { manager ->
+                val message = messageText + (location?.let { "\nLocation: ${GOOGLE_MAP_LINK_TEMPLATE.format(it.latitude, it.longitude)}" } ?: "")
                 numbers.forEach {
                     manager.sendTextMessage(
-                        it, // some hardcoded number for now
+                        it,
                         null,
-                        messageText,
+                        message,
                         null,
                         null
                     )

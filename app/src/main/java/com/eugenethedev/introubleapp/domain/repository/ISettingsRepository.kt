@@ -9,5 +9,6 @@ interface ISettingsRepository {
     suspend fun addReceiver(name: String, number: String)
     suspend fun removeReceiver(receiver: Receiver)
     suspend fun changeMessageText(messageText: String)
+    suspend fun toggleLocation(isEnabled: Boolean)
     suspend fun flush()
 }

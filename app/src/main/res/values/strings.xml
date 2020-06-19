@@ -11,6 +11,7 @@
     <string name="message_text">Message text</string>
     <string name="receivers">Receivers</string>
     <string name="add_receiver">ADD RECEIVER</string>
+    <string name="location_title">Send my location</string>
 
     <string name="remove_button_description">Remove button</string>
     <string name="add_button_description">Add button</string>

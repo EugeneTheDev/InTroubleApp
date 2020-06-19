@@ -56,4 +56,10 @@ class SettingsRepository @Inject constructor(
         }
     }
 
+    override suspend fun toggleLocation(isEnabled: Boolean) {
+        realm.executeTransaction {
+            settings.smsSetting!!.isLocationEnabled = isEnabled
+        }
+    }
+
 }

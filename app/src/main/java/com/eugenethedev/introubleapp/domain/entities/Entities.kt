@@ -10,7 +10,8 @@ open class Settings (
 open class SmsSetting (
     var isEnabled: Boolean = false,
     var receivers: RealmList<Receiver> = RealmList(),
-    var messageText: String = ""
+    var messageText: String = "",
+    var isLocationEnabled: Boolean = false
 ) : RealmObject()
 
 open class Receiver (

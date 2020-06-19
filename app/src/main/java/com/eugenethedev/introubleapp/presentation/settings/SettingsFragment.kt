@@ -30,6 +30,7 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
         private const val REQUEST_SMS_PERMISSION = 42
         private const val REQUEST_CONTACTS_PERMISSION = 43
         private const val REQUEST_PICK_CONTACT = 44
+        private const val REQUEST_LOCATION_PERMISSION = 45
     }
 
     @Inject
@@ -72,7 +73,7 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
 
         addReceiverButton.setOnClickListener {
             if (!isPermissionGranted(Manifest.permission.READ_CONTACTS)) {
-                requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS), REQUEST_CONTACTS_PERMISSION )
+                requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS), REQUEST_CONTACTS_PERMISSION)
             } else {
                 addNewReceiver()
             }
@@ -82,8 +83,17 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
             settingsPresenter.onMessageTextChanged(messageEditText.text.toString())
         }
 
+        locationToggle.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked && !isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION)
+            } else {
+                settingsPresenter.onToggleLocation(isChecked)
+            }
+        }
+
         settingsPresenter.onCreate()
     }
+
 
     private fun addNewReceiver() {
         startActivityForResult(
@@ -114,6 +124,14 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
                     addNewReceiver()
                 }
             }
+
+            REQUEST_LOCATION_PERMISSION -> {
+                if (isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    settingsPresenter.onToggleLocation(locationToggle.isChecked)
+                } else {
+                    locationToggle.isChecked = false
+                }
+            }
         }
     }
 
@@ -135,6 +153,12 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
 
     override fun setSmsToggleState(isChecked: Boolean) {
         smsToggle.isChecked = isChecked
+        smsToggle.jumpDrawablesToCurrentState()
+    }
+
+    override fun setLocationToggleState(isChecked: Boolean) {
+        locationToggle.isChecked = isChecked
+        locationToggle.jumpDrawablesToCurrentState()
     }
 
     override fun setupReceiversList(receivers: RealmList<Receiver>) {
@@ -152,6 +176,10 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
 
     override fun setMessageText(messageText: String) {
         messageEditText.text = SpannableStringBuilder(messageText)
+    }
+
+    override fun makeVisible() {
+        settingsNestedScrollView.visibility = View.VISIBLE
     }
 
 }

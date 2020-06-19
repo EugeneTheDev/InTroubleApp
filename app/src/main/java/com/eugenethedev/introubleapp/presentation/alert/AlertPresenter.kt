@@ -4,15 +4,15 @@ import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.eugenethedev.introubleapp.domain.entities.Settings
 import com.eugenethedev.introubleapp.domain.repository.ISettingsRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.tasks.Tasks
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @InjectViewState
 class AlertPresenter @Inject constructor(
-    private val settingsRepository: ISettingsRepository
+    private val settingsRepository: ISettingsRepository,
+    private val fusedClient: FusedLocationProviderClient
 ) : MvpPresenter<AlertView>(), CoroutineScope {
     override val coroutineContext = Dispatchers.Main
     private lateinit var settings: Settings
@@ -24,9 +24,19 @@ class AlertPresenter @Inject constructor(
     fun onAlertButtonClick() = launch {
         settings.smsSetting?.let { smsSetting ->
             if (smsSetting.isEnabled) {
+                val isLocationEnabled = smsSetting.isLocationEnabled
+                val location = withContext(Dispatchers.IO) {
+                    if (isLocationEnabled) {
+                        Tasks.await(fusedClient.lastLocation)
+                    } else {
+                        null
+                    }
+                }
+
                 viewState.sendMessages(
-                    smsSetting.receivers.map { it.number },
-                    smsSetting.messageText
+                    numbers = smsSetting.receivers.map { it.number },
+                    messageText = smsSetting.messageText,
+                    location = location
                 )
             }
         }

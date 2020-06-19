@@ -11,6 +11,8 @@ class InTroubleApp : Application() {
     override fun onCreate() {
         super.onCreate()
         Realm.init(this)
-        appComponent = DaggerAppComponent.builder().build()
+        appComponent = DaggerAppComponent.builder()
+            .context(applicationContext)
+            .build()
     }
 }
