@@ -2,22 +2,29 @@ package com.eugenethedev.introubleapp.presentation.settings
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.util.Log
+import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.arellomobile.mvp.MvpAppCompatFragment
+import com.arellomobile.mvp.presenter.InjectPresenter
+import com.arellomobile.mvp.presenter.ProvidePresenter
+import com.eugenethedev.introubleapp.InTroubleApp
 import com.eugenethedev.introubleapp.R
+import com.eugenethedev.introubleapp.domain.entities.Receiver
 import com.eugenethedev.introubleapp.presentation.isPermissionGranted
+import io.realm.RealmList
 import kotlinx.android.synthetic.main.fragment_settings.*
+import javax.inject.Inject
 
-class SettingsFragment : Fragment() {
+class SettingsFragment : MvpAppCompatFragment(), SettingsView {
 
     companion object {
         private const val REQUEST_SMS_PERMISSION = 42
@@ -25,12 +32,26 @@ class SettingsFragment : Fragment() {
         private const val REQUEST_PICK_CONTACT = 44
     }
 
+    @Inject
+    @InjectPresenter
+    lateinit var settingsPresenter: SettingsPresenter
+
+    @ProvidePresenter
+    fun provideSettingsPresenter() = settingsPresenter
+
+    private lateinit var receiversAdapter: ReceiversAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_settings, container, false)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as InTroubleApp).appComponent.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -41,17 +62,11 @@ class SettingsFragment : Fragment() {
         }
         setHasOptionsMenu(true)
 
-        val adapter = ReceiversAdapter()
-        receiversList.adapter = adapter
-        addReceiverButton.setOnClickListener {
-            adapter.addNewAddItem()
-        }
-
         smsToggle.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked && !isPermissionGranted(Manifest.permission.SEND_SMS)) {
                 requestPermissions(arrayOf(Manifest.permission.SEND_SMS), REQUEST_SMS_PERMISSION)
             } else {
-                smsToggleChange(isChecked)
+                settingsPresenter.onToggleSms(isChecked)
             }
         }
 
@@ -62,10 +77,12 @@ class SettingsFragment : Fragment() {
                 addNewReceiver()
             }
         }
-    }
 
-    private fun smsToggleChange(isChecked: Boolean) {
+        messageEditText.setOnFocusChangeListener { _, _ ->
+            settingsPresenter.onMessageTextChanged(messageEditText.text.toString())
+        }
 
+        settingsPresenter.onCreate()
     }
 
     private fun addNewReceiver() {
@@ -86,7 +103,7 @@ class SettingsFragment : Fragment() {
         when (requestCode) {
             REQUEST_SMS_PERMISSION -> {
                 if (isPermissionGranted(Manifest.permission.SEND_SMS)) {
-                    smsToggleChange(smsToggle.isChecked)
+                    settingsPresenter.onToggleSms(smsToggle.isChecked)
                 } else {
                     smsToggle.isChecked = false
                 }
@@ -110,9 +127,31 @@ class SettingsFragment : Fragment() {
                     val name = cursor.getString(nameColumnsIndex)
                     val numberColumnIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
                     val number = cursor.getString(numberColumnIndex)
+                    settingsPresenter.onAddReceiver(name, number)
                 }
             }
         }
+    }
+
+    override fun setSmsToggleState(isChecked: Boolean) {
+        smsToggle.isChecked = isChecked
+    }
+
+    override fun setupReceiversList(receivers: RealmList<Receiver>) {
+        receiversAdapter = ReceiversAdapter(
+            receivers = receivers,
+            removeReceiver = { settingsPresenter.onRemoveReceiver(it) }
+        )
+        receiversList.adapter = receiversAdapter
+
+        addReceiverButton.setOnClickListener {
+            addNewReceiver()
+        }
+
+    }
+
+    override fun setMessageText(messageText: String) {
+        messageEditText.text = SpannableStringBuilder(messageText)
     }
 
 }

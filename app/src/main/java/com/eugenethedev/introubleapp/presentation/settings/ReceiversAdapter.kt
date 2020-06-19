@@ -5,39 +5,46 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.eugenethedev.introubleapp.R
+import com.eugenethedev.introubleapp.domain.entities.Receiver
+import io.realm.RealmList
 import kotlinx.android.synthetic.main.item_receiver.view.*
 
-class ReceiversAdapter : RecyclerView.Adapter<ReceiversAdapter.ReceiverViewHolder>() {
-
-    private val receivers = mutableListOf("Bob", "Jack", "Another", "Name")
+class ReceiversAdapter(
+    private val receivers: RealmList<Receiver>,
+    private val removeReceiver: (Receiver) -> Unit
+) : RecyclerView.Adapter<ReceiversAdapter.ReceiverViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReceiverViewHolder {
         val vView = LayoutInflater.from(parent.context).inflate(R.layout.item_receiver, parent, false)
         return ReceiverViewHolder(vView)
 
     }
+    
+    init {
+        receivers.addChangeListener { _, changeSet ->
+            changeSet.insertions.takeIf { it.isNotEmpty() }?.let {
+                notifyItemRangeInserted(it.first(), it.size)
+            }
+
+            changeSet.deletions.takeIf { it.isNotEmpty() }?.let {
+                notifyItemRemoved(it.first())
+                notifyDataSetChanged()
+            }
+        }
+    }
 
     override fun getItemCount() = receivers.size
 
-
-    fun addNewAddItem() {
-
-    }
-
     override fun onBindViewHolder(holder: ReceiverViewHolder, position: Int) {
-        holder.bind(receivers[position]) {
-            receivers.removeAt(position)
-            notifyItemRemoved(position)
-            notifyDataSetChanged()
-        }
-
+        val receiver = receivers[position]!!
+        holder.bind(receiver, removeReceiver)
     }
 
     class ReceiverViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        fun bind(receiver: String, removeAction: () -> Unit) = itemView.apply {
-            receiverName.text = receiver
-            receiverNumber.text = "+712345678910"
-            removeReceiver.setOnClickListener { removeAction() }
+        fun bind(receiver: Receiver, removeAction: (Receiver) -> Unit) = itemView.apply {
+            receiverName.text = receiver.name
+            receiverNumber.text = receiver.number
+            removeReceiver.setOnClickListener { removeAction(receiver) }
         }
     }
 }
