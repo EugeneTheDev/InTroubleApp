@@ -11,7 +11,11 @@
         tools:layout="@layout/fragment_alert">
         <action
             android:id="@+id/action_fragmentAlert_to_fragmentSettings"
-            app:destination="@id/fragmentSettings"/>
+            app:destination="@id/fragmentSettings"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/stay"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popEnterAnim="@anim/stay"/>
     </fragment>
 
     <fragment
