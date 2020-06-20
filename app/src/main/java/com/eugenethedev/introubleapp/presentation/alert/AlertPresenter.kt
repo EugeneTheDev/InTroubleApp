@@ -5,6 +5,8 @@ import com.arellomobile.mvp.MvpPresenter
 import com.eugenethedev.introubleapp.domain.entities.Settings
 import com.eugenethedev.introubleapp.domain.repository.ISettingsRepository
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.tasks.Tasks
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -24,13 +26,20 @@ class AlertPresenter @Inject constructor(
     fun onAlertButtonClick() = launch {
         settings.smsSetting?.let { smsSetting ->
             if (smsSetting.isEnabled) {
-                val isLocationEnabled = smsSetting.isLocationEnabled
-                val location = withContext(Dispatchers.IO) {
-                    if (isLocationEnabled) {
+                val location = if (smsSetting.isLocationEnabled) {
+
+                    // this shitty code force location info to update
+                    fusedClient.requestLocationUpdates(LocationRequest.create().apply {
+                        interval = 1
+                        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                        numUpdates = 1
+                    }, object : LocationCallback() {}, null)
+
+                    withContext(Dispatchers.IO) {
                         Tasks.await(fusedClient.lastLocation)
-                    } else {
-                        null
                     }
+                } else {
+                    null
                 }
 
                 viewState.sendMessages(
