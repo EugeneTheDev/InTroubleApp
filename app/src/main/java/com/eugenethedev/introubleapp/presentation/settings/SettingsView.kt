@@ -21,5 +21,8 @@ interface SettingsView : MvpView {
     fun setupReceiversList(receivers: RealmList<Receiver>)
 
     @StateStrategyType(AddToEndSingleStrategy::class)
+    fun setCameraToggleState(isChecked: Boolean)
+
+    @StateStrategyType(AddToEndSingleStrategy::class)
     fun makeVisible()
 }

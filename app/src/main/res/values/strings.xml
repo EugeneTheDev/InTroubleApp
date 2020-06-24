@@ -7,7 +7,7 @@
     <string name="settings_button_description">Settings button</string>
 
     <string name="settings_title">Settings</string>
-    <string name="sms_title">SMS</string>
+    <string name="sms_title">Send SMS</string>
     <string name="message_text">Message text</string>
     <string name="receivers">Receivers</string>
     <string name="add_receiver">ADD RECEIVER</string>
@@ -17,5 +17,8 @@
     <string name="add_button_description">Add button</string>
     <string name="name_hint">Name</string>
     <string name="number_hint">Number</string>
+
+    <string name="camera_title">Start camera</string>
+    <string name="camera_description">It\'s highly recommended to turn on sync with Google Photos (or other cloud storage). Thus you could save recordings even if they would be removed on device</string>
 
 </resources>

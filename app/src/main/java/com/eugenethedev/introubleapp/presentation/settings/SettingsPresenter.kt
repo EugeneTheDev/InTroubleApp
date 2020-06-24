@@ -17,12 +17,15 @@ class SettingsPresenter @Inject constructor(
 
     fun onCreate() = launch {
         val settings = settingsRepository.getSettings()
-        settings.smsSetting?.let {
+        settings.smsSetting!!.let {
             viewState.setSmsToggleState(it.isEnabled)
             viewState.setupReceiversList(it.receivers)
             viewState.setMessageText(it.messageText)
             viewState.setLocationToggleState(it.isLocationEnabled)
         }
+
+        viewState.setCameraToggleState(settings.cameraSettings!!.isEnabled)
+
         viewState.makeVisible()
     }
 
@@ -44,6 +47,10 @@ class SettingsPresenter @Inject constructor(
 
     fun onToggleLocation(isChecked: Boolean) = launch {
         settingsRepository.toggleLocation(isChecked)
+    }
+
+    fun onToggleCamera(isChecked: Boolean) = launch {
+        settingsRepository.toggleCamera(isChecked)
     }
 
     override fun onDestroy() {

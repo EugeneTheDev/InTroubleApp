@@ -4,7 +4,8 @@ import io.realm.RealmList
 import io.realm.RealmObject
 
 open class Settings (
-    var smsSetting: SmsSetting? = SmsSetting()
+    var smsSetting: SmsSetting? = SmsSetting(),
+    var cameraSettings: CameraSettings? = CameraSettings()
 ) : RealmObject()
 
 open class SmsSetting (
@@ -17,4 +18,8 @@ open class SmsSetting (
 open class Receiver (
     var name: String = "",
     var number: String = ""
+) : RealmObject()
+
+open class CameraSettings(
+    var isEnabled: Boolean = false
 ) : RealmObject()

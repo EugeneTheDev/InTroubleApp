@@ -10,5 +10,6 @@ interface ISettingsRepository {
     suspend fun removeReceiver(receiver: Receiver)
     suspend fun changeMessageText(messageText: String)
     suspend fun toggleLocation(isEnabled: Boolean)
+    suspend fun toggleCamera(isEnabled: Boolean)
     suspend fun flush()
 }

@@ -16,4 +16,7 @@ interface AlertView : MvpView {
 
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun setAfterAlertText()
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun startCamera()
 }

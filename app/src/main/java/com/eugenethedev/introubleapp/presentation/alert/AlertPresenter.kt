@@ -50,6 +50,10 @@ class AlertPresenter @Inject constructor(
             }
         }
 
+        if (settings.cameraSettings!!.isEnabled) {
+            viewState.startCamera()
+        }
+
         viewState.setAfterAlertText()
         delay(4000)
         viewState.setScreenText()

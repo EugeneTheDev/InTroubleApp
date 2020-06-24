@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="settings_block_margin">32dp</dimen>
+    <dimen name="settings_item_margin">16dp</dimen>
+    <dimen name="settings_title_size">20sp</dimen>
+    <dimen name="settings_item_text_size">16sp</dimen>
+</resources>

@@ -2,14 +2,17 @@ package com.eugenethedev.introubleapp.presentation.alert
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.location.Location
 import android.os.Bundle
+import android.provider.MediaStore
 import android.telephony.SmsManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
@@ -81,7 +84,12 @@ class AlertFragment : MvpAppCompatFragment(), AlertView {
         }
     }
 
+    override fun startCamera() {
+        startActivity(Intent(MediaStore.INTENT_ACTION_VIDEO_CAMERA))
+    }
+
     override fun setAfterAlertText() {
+        Toast.makeText(requireContext(), R.string.alert_after_click_text, Toast.LENGTH_SHORT).show()
         alertText.startAnimation(anim)
         anim.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationEnd(animation: Animation?) { }

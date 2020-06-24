@@ -91,6 +91,10 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
             }
         }
 
+        cameraToggle.setOnCheckedChangeListener { _, isChecked ->
+            settingsPresenter.onToggleCamera(isChecked)
+        }
+
         settingsPresenter.onCreate()
     }
 
@@ -176,6 +180,11 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
 
     override fun setMessageText(messageText: String) {
         messageEditText.text = SpannableStringBuilder(messageText)
+    }
+
+    override fun setCameraToggleState(isChecked: Boolean) {
+        cameraToggle.isChecked = isChecked
+        cameraToggle.jumpDrawablesToCurrentState()
     }
 
     override fun makeVisible() {

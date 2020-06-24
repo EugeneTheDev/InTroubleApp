@@ -62,4 +62,10 @@ class SettingsRepository @Inject constructor(
         }
     }
 
+    override suspend fun toggleCamera(isEnabled: Boolean) {
+        realm.executeTransaction {
+            settings.cameraSettings!!.isEnabled = isEnabled
+        }
+    }
+
 }
