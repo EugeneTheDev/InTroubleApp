@@ -31,41 +31,30 @@ class SettingsRepository @Inject constructor(
         realm.close() // close realm instance after all changes
     }
 
-    override suspend fun toggleSms(isEnabled: Boolean) {
-        realm.executeTransaction {
-            settings.smsSetting!!.isEnabled = isEnabled
-        }
+    override suspend fun toggleSms(isEnabled: Boolean) = tx {
+        settings.smsSetting!!.isEnabled = isEnabled
     }
 
-    override suspend fun addReceiver(name: String, number: String) {
-        realm.executeTransaction {
-            val receiver = it.copyToRealm(Receiver(name, number))
-            settings.smsSetting!!.receivers.add(receiver)
-        }
+    override suspend fun addReceiver(name: String, number: String) = tx {
+        val receiver = it.copyToRealm(Receiver(name, number))
+        settings.smsSetting!!.receivers.add(receiver)
     }
 
-    override suspend fun removeReceiver(receiver: Receiver) {
-        realm.executeTransaction {
-            settings.smsSetting!!.receivers.remove(receiver)
-        }
+    override suspend fun removeReceiver(receiver: Receiver) = tx {
+        settings.smsSetting!!.receivers.remove(receiver)
     }
 
-    override suspend fun changeMessageText(messageText: String) {
-        realm.executeTransaction {
-            settings.smsSetting!!.messageText = messageText
-        }
+    override suspend fun changeMessageText(messageText: String) = tx {
+        settings.smsSetting!!.messageText = messageText
     }
 
-    override suspend fun toggleLocation(isEnabled: Boolean) {
-        realm.executeTransaction {
-            settings.smsSetting!!.isLocationEnabled = isEnabled
-        }
+    override suspend fun toggleLocation(isEnabled: Boolean) = tx {
+        settings.smsSetting!!.isLocationEnabled = isEnabled
     }
 
-    override suspend fun toggleCamera(isEnabled: Boolean) {
-        realm.executeTransaction {
-            settings.cameraSettings!!.isEnabled = isEnabled
-        }
+    override suspend fun toggleCamera(isEnabled: Boolean) = tx {
+        settings.cameraSettings!!.isEnabled = isEnabled
     }
 
+    private fun tx(action: (Realm) -> Unit) = realm.executeTransaction { action(it) }
 }
