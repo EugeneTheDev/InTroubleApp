@@ -1,5 +1,6 @@
 package com.eugenethedev.introubleapp.domain.repository
 
+import com.eugenethedev.introubleapp.domain.entities.Folder
 import com.eugenethedev.introubleapp.domain.entities.Receiver
 import com.eugenethedev.introubleapp.domain.entities.Settings
 
@@ -11,5 +12,8 @@ interface ISettingsRepository {
     suspend fun changeMessageText(messageText: String)
     suspend fun toggleLocation(isEnabled: Boolean)
     suspend fun toggleCamera(isEnabled: Boolean)
+    suspend fun toggleFolders(isEnabled: Boolean)
+    suspend fun addFolder(path: String)
+    suspend fun removeFolder(folder: Folder)
     suspend fun flush()
 }

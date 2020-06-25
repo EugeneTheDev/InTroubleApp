@@ -12,6 +12,9 @@ interface AlertView : MvpView {
     fun sendMessages(numbers: List<String>, messageText: String, location: Location?)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
+    fun deleteFolders(foldersPaths: List<String>)
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
     fun setScreenText()
 
     @StateStrategyType(OneExecutionStateStrategy::class)

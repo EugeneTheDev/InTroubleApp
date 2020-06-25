@@ -24,34 +24,37 @@ class AlertPresenter @Inject constructor(
     }
 
     fun onAlertButtonClick() = launch {
-        settings.smsSetting?.let { smsSetting ->
-            if (smsSetting.isEnabled) {
-                val location = if (smsSetting.isLocationEnabled) {
+        settings.smsSetting!!.takeIf { it.isEnabled }?.let { smsSetting ->
+            val location = if (smsSetting.isLocationEnabled) {
 
-                    // this shitty code force location info to update
-                    fusedClient.requestLocationUpdates(LocationRequest.create().apply {
-                        interval = 1
-                        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-                        numUpdates = 1
-                    }, object : LocationCallback() {}, null)
+                // this shitty code force location info to update
+                fusedClient.requestLocationUpdates(LocationRequest.create().apply {
+                    interval = 1
+                    priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                    numUpdates = 1
+                }, object : LocationCallback() {}, null)
 
-                    withContext(Dispatchers.IO) {
-                        Tasks.await(fusedClient.lastLocation)
-                    }
-                } else {
-                    null
+                withContext(Dispatchers.IO) {
+                    Tasks.await(fusedClient.lastLocation)
                 }
-
-                viewState.sendMessages(
-                    numbers = smsSetting.receivers.map { it.number },
-                    messageText = smsSetting.messageText,
-                    location = location
-                )
+            } else {
+                null
             }
+
+            viewState.sendMessages(
+                numbers = smsSetting.receivers.map { it.number },
+                messageText = smsSetting.messageText,
+                location = location
+            )
+
         }
 
         if (settings.cameraSettings!!.isEnabled) {
             viewState.startCamera()
+        }
+
+        settings.foldersSettings!!.takeIf { it.isEnabled }?.let { foldersSettings ->
+            viewState.deleteFolders(foldersSettings.folders.map { it.absolutePath })
         }
 
         viewState.setAfterAlertText()

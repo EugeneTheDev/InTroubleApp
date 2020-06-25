@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import com.arellomobile.mvp.MvpAppCompatFragment
@@ -18,10 +19,12 @@ import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.eugenethedev.introubleapp.InTroubleApp
 import com.eugenethedev.introubleapp.R
+import com.eugenethedev.introubleapp.domain.entities.Folder
 import com.eugenethedev.introubleapp.domain.entities.Receiver
 import com.eugenethedev.introubleapp.presentation.isPermissionGranted
 import io.realm.RealmList
 import kotlinx.android.synthetic.main.fragment_settings.*
+import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
 class SettingsFragment : MvpAppCompatFragment(), SettingsView {
@@ -31,6 +34,8 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
         private const val REQUEST_CONTACTS_PERMISSION = 43
         private const val REQUEST_PICK_CONTACT = 44
         private const val REQUEST_LOCATION_PERMISSION = 45
+        private const val REQUEST_WRITE_STORAGE_PERMISSION = 46
+        private const val REQUEST_PICK_FOLDER = 47
     }
 
     @Inject
@@ -41,6 +46,7 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
     fun provideSettingsPresenter() = settingsPresenter
 
     private lateinit var receiversAdapter: ReceiversAdapter
+    private lateinit var foldersAdapter: FoldersAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -91,8 +97,23 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
             }
         }
 
+        foldersToggle.setOnCheckedChangeListener {  _, isChecked ->
+            if (isChecked && !isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_STORAGE_PERMISSION)
+            } else {
+                settingsPresenter.onToggleFolders(isChecked)
+            }
+        }
+
         cameraToggle.setOnCheckedChangeListener { _, isChecked ->
             settingsPresenter.onToggleCamera(isChecked)
+        }
+
+        addFolderButton.setOnClickListener {
+            val chooseIntent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).also {
+                it.addCategory(Intent.CATEGORY_DEFAULT)
+            }
+            startActivityForResult(Intent.createChooser(chooseIntent, getString(R.string.pick_folder_text)), REQUEST_PICK_FOLDER)
         }
 
         settingsPresenter.onCreate()
@@ -136,20 +157,43 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
                     locationToggle.isChecked = false
                 }
             }
+
+            REQUEST_WRITE_STORAGE_PERMISSION -> {
+                if (isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    settingsPresenter.onToggleFolders(foldersToggle.isChecked)
+                } else {
+                    foldersToggle.isChecked = false
+                }
+            }
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        if (requestCode == REQUEST_PICK_CONTACT && resultCode == Activity.RESULT_OK) {
-            intent?.data?.let { uri ->
-                val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER)
-                requireActivity().contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
-                    cursor.moveToFirst()
-                    val nameColumnsIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-                    val name = cursor.getString(nameColumnsIndex)
-                    val numberColumnIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                    val number = cursor.getString(numberColumnIndex)
-                    settingsPresenter.onAddReceiver(name, number)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_PICK_CONTACT -> intent?.data?.let { uri ->
+                    val projection = arrayOf(
+                        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                        ContactsContract.CommonDataKinds.Phone.NUMBER
+                    )
+                    requireActivity().contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+                            cursor.moveToFirst()
+                            val nameColumnsIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                            val name = cursor.getString(nameColumnsIndex)
+                            val numberColumnIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                            val number = cursor.getString(numberColumnIndex)
+                            settingsPresenter.onAddReceiver(name, number)
+                    }
+                }
+
+                REQUEST_PICK_FOLDER -> intent?.data?.let { uri ->
+                    val path = uri.path ?: throw IllegalArgumentException("Null path")
+
+                    if ("/tree/primary:" in path) {
+                        settingsPresenter.onAddFolder(path.replace("/tree/primary:", "/storage/emulated/0/"))
+                    } else {
+                        Toast.makeText(requireContext(), R.string.incorrect_folder, Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         }
@@ -171,11 +215,19 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
             removeReceiver = { settingsPresenter.onRemoveReceiver(it) }
         )
         receiversList.adapter = receiversAdapter
+    }
 
-        addReceiverButton.setOnClickListener {
-            addNewReceiver()
-        }
+    override fun setupFoldersList(folders: RealmList<Folder>) {
+        foldersAdapter = FoldersAdapter(
+            folders = folders,
+            removeFolder = { settingsPresenter.onRemoveFolder(it) }
+        )
+        foldersList.adapter = foldersAdapter
+    }
 
+    override fun setFoldersToggleState(isChecked: Boolean) {
+        foldersToggle.isChecked = isChecked
+        foldersToggle.jumpDrawablesToCurrentState()
     }
 
     override fun setMessageText(messageText: String) {

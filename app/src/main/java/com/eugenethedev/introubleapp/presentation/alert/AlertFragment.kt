@@ -21,6 +21,7 @@ import com.eugenethedev.introubleapp.InTroubleApp
 import com.eugenethedev.introubleapp.R
 import com.eugenethedev.introubleapp.presentation.isPermissionGranted
 import kotlinx.android.synthetic.main.fragment_alert.*
+import java.io.File
 import javax.inject.Inject
 
 class AlertFragment : MvpAppCompatFragment(), AlertView {
@@ -86,6 +87,12 @@ class AlertFragment : MvpAppCompatFragment(), AlertView {
 
     override fun startCamera() {
         startActivity(Intent(MediaStore.INTENT_ACTION_VIDEO_CAMERA))
+    }
+
+    override fun deleteFolders(foldersPaths: List<String>) {
+        foldersPaths.map { File(it) }
+            .filter { it.isDirectory && it.exists() }
+            .map { it.deleteRecursively() }
     }
 
     override fun setAfterAlertText() {

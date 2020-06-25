@@ -1,5 +1,6 @@
 package com.eugenethedev.introubleapp.data
 
+import com.eugenethedev.introubleapp.domain.entities.Folder
 import com.eugenethedev.introubleapp.domain.entities.Receiver
 import com.eugenethedev.introubleapp.domain.entities.Settings
 import com.eugenethedev.introubleapp.domain.repository.ISettingsRepository
@@ -56,5 +57,18 @@ class SettingsRepository @Inject constructor(
         settings.cameraSettings!!.isEnabled = isEnabled
     }
 
+    override suspend fun toggleFolders(isEnabled: Boolean) = tx {
+        settings.foldersSettings!!.isEnabled = isEnabled
+    }
+
+    override suspend fun addFolder(path: String) = tx {
+        settings.foldersSettings!!.folders.add(Folder(path))
+    }
+
+    override suspend fun removeFolder(folder: Folder) = tx {
+        settings.foldersSettings!!.folders.remove(folder)
+    }
+
     private fun tx(action: (Realm) -> Unit) = realm.executeTransaction { action(it) }
+
 }

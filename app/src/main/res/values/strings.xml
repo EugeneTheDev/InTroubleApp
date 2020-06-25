@@ -18,7 +18,14 @@
     <string name="name_hint">Name</string>
     <string name="number_hint">Number</string>
 
+    <string name="folders_title">Delete folders</string>
+    <string name="folders_list">Paths to folders</string>
+    <string name="add_folder">ADD FOLDER</string>
+    <string name="incorrect_folder">Incorrect folder. Choose folder from internal storage</string>
+
     <string name="camera_title">Start camera</string>
     <string name="camera_description">It\'s highly recommended to turn on sync with Google Photos (or other cloud storage). Thus you could save recordings even if they would be removed on device</string>
+
+    <string name="pick_folder_text">Choose directory</string>
 
 </resources>

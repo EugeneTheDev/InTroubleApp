@@ -2,6 +2,7 @@ package com.eugenethedev.introubleapp.presentation.settings
 
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
+import com.eugenethedev.introubleapp.domain.entities.Folder
 import com.eugenethedev.introubleapp.domain.entities.Receiver
 import com.eugenethedev.introubleapp.domain.repository.ISettingsRepository
 import kotlinx.coroutines.CoroutineScope
@@ -25,6 +26,11 @@ class SettingsPresenter @Inject constructor(
         }
 
         viewState.setCameraToggleState(settings.cameraSettings!!.isEnabled)
+
+        settings.foldersSettings!!.let {
+            viewState.setFoldersToggleState(it.isEnabled)
+            viewState.setupFoldersList(it.folders)
+        }
 
         viewState.makeVisible()
     }
@@ -51,6 +57,18 @@ class SettingsPresenter @Inject constructor(
 
     fun onToggleCamera(isChecked: Boolean) = launch {
         settingsRepository.toggleCamera(isChecked)
+    }
+
+    fun onToggleFolders(isChecked: Boolean) = launch {
+        settingsRepository.toggleFolders(isChecked)
+    }
+
+    fun onAddFolder(path: String) = launch {
+        settingsRepository.addFolder(path)
+    }
+
+    fun onRemoveFolder(folder: Folder) = launch {
+        settingsRepository.removeFolder(folder)
     }
 
     override fun onDestroy() {

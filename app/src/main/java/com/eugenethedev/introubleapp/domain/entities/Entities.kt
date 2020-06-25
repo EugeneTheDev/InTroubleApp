@@ -5,7 +5,8 @@ import io.realm.RealmObject
 
 open class Settings (
     var smsSetting: SmsSetting? = SmsSetting(),
-    var cameraSettings: CameraSettings? = CameraSettings()
+    var cameraSettings: CameraSettings? = CameraSettings(),
+    var foldersSettings: FoldersSettings? = FoldersSettings()
 ) : RealmObject()
 
 open class SmsSetting (
@@ -22,4 +23,14 @@ open class Receiver (
 
 open class CameraSettings(
     var isEnabled: Boolean = false
+) : RealmObject()
+
+open class FoldersSettings(
+    var isEnabled: Boolean = false,
+    var folders: RealmList<Folder> = RealmList()
+) : RealmObject()
+
+open class Folder(
+    var absolutePath: String = "",
+    var displayPath: String = absolutePath.replace("/storage/emulated/0/", "./")
 ) : RealmObject()
