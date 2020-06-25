@@ -26,19 +26,25 @@
 
         <TextView
             android:id="@+id/receiverName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="4"
             android:textColor="@android:color/black"
             android:textSize="16sp"
+            android:maxLines="1"
+            android:ellipsize="end"
             tools:text="Bob"/>
 
         <TextView
             android:id="@+id/receiverNumber"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="4"
             android:layout_marginStart="10dp"
             android:textColor="@android:color/black"
             android:textSize="16sp"
+            android:maxLines="1"
+            android:ellipsize="end"
             tools:text="+712345678910"/>
 
         <View
