@@ -1,12 +1,7 @@
 package com.eugenethedev.introubleapp.presentation.alert
 
-import android.Manifest
 import android.content.Context
-import android.content.Intent
-import android.location.Location
 import android.os.Bundle
-import android.provider.MediaStore
-import android.telephony.SmsManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,9 +14,7 @@ import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.eugenethedev.introubleapp.InTroubleApp
 import com.eugenethedev.introubleapp.R
-import com.eugenethedev.introubleapp.presentation.isPermissionGranted
 import kotlinx.android.synthetic.main.fragment_alert.*
-import java.io.File
 import javax.inject.Inject
 
 class AlertFragment : MvpAppCompatFragment(), AlertView {
@@ -37,10 +30,6 @@ class AlertFragment : MvpAppCompatFragment(), AlertView {
         it.duration = 500
         it.repeatCount = 1
         it.repeatMode = Animation.REVERSE
-    }
-
-    companion object {
-        private const val GOOGLE_MAP_LINK_TEMPLATE = "https://maps.google.com/?q=%s,%s"
     }
 
     override fun onCreateView(
@@ -66,33 +55,6 @@ class AlertFragment : MvpAppCompatFragment(), AlertView {
         }
 
         alertPresenter.onCreate()
-    }
-
-    override fun sendMessages(numbers: List<String>, messageText: String, location: Location?) {
-        if (isPermissionGranted(Manifest.permission.SEND_SMS)) {
-            SmsManager.getDefault()?.let { manager ->
-                val message = messageText + (location?.let { "\nLocation: ${GOOGLE_MAP_LINK_TEMPLATE.format(it.latitude, it.longitude)}" } ?: "")
-                numbers.forEach {
-                    manager.sendTextMessage(
-                        it,
-                        null,
-                        message,
-                        null,
-                        null
-                    )
-                }
-            }
-        }
-    }
-
-    override fun startCamera() {
-        startActivity(Intent(MediaStore.INTENT_ACTION_VIDEO_CAMERA))
-    }
-
-    override fun deleteFolders(foldersPaths: List<String>) {
-        foldersPaths.map { File(it) }
-            .filter { it.isDirectory && it.exists() }
-            .map { it.deleteRecursively() }
     }
 
     override fun setAfterAlertText() {
