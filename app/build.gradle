@@ -14,14 +14,26 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
+        archivesBaseName = "InTroubleApp-$versionName"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        release {
+            storeFile file("./keystores/release.jks")
+            storePassword "Xu7haEluoM"
+            keyAlias "release"
+            keyPassword "Xu7haEluoM"
+        }
+    }
+
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
