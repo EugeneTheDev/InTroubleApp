@@ -62,24 +62,23 @@ class AlertPresenter @Inject constructor(
                 messageText = smsSetting.messageText,
                 location = location
             )
-
-            if (settings.cameraSettings!!.isEnabled) {
-                launch {
-                    startCamera()
-                }
-            }
-
-            settings.foldersSettings!!.takeIf { it.isEnabled }?.let { foldersSettings ->
-                launch {
-                    deleteFolders(foldersSettings.folders.map { it.absolutePath })
-                }
-            }
-
-            viewState.setAfterAlertText()
-            delay(4000)
-            viewState.setScreenText()
-
         }
+
+        if (settings.cameraSettings!!.isEnabled) {
+            launch {
+                startCamera()
+            }
+        }
+
+        settings.foldersSettings!!.takeIf { it.isEnabled }?.let { foldersSettings ->
+            launch {
+                deleteFolders(foldersSettings.folders.map { it.absolutePath })
+            }
+        }
+
+        viewState.setAfterAlertText()
+        delay(4000)
+        viewState.setScreenText()
     }
 
     private fun sendMessages(numbers: List<String>, messageText: String, location: Location? = null) {
