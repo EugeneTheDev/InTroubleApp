@@ -7,12 +7,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.text.SpannableStringBuilder
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.children
 import androidx.navigation.fragment.findNavController
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
@@ -70,6 +68,7 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
         setHasOptionsMenu(true)
 
         smsToggle.setOnCheckedChangeListener { _, isChecked ->
+            enableDisableBlock(smsBlock, isChecked)
             if (isChecked && !isPermissionGranted(Manifest.permission.SEND_SMS)) {
                 requestPermissions(arrayOf(Manifest.permission.SEND_SMS), REQUEST_SMS_PERMISSION)
             } else {
@@ -98,6 +97,7 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
         }
 
         foldersToggle.setOnCheckedChangeListener {  _, isChecked ->
+            enableDisableBlock(foldersBlock, isChecked)
             if (isChecked && !isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_STORAGE_PERMISSION)
             } else {
@@ -106,6 +106,7 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
         }
 
         cameraToggle.setOnCheckedChangeListener { _, isChecked ->
+            enableDisableBlock(cameraBlock, isChecked)
             settingsPresenter.onToggleCamera(isChecked)
         }
 
@@ -202,6 +203,7 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
     override fun setSmsToggleState(isChecked: Boolean) {
         smsToggle.isChecked = isChecked
         smsToggle.jumpDrawablesToCurrentState()
+        enableDisableBlock(smsBlock, isChecked)
     }
 
     override fun setLocationToggleState(isChecked: Boolean) {
@@ -228,6 +230,7 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
     override fun setFoldersToggleState(isChecked: Boolean) {
         foldersToggle.isChecked = isChecked
         foldersToggle.jumpDrawablesToCurrentState()
+        enableDisableBlock(foldersBlock, isChecked)
     }
 
     override fun setMessageText(messageText: String) {
@@ -237,10 +240,27 @@ class SettingsFragment : MvpAppCompatFragment(), SettingsView {
     override fun setCameraToggleState(isChecked: Boolean) {
         cameraToggle.isChecked = isChecked
         cameraToggle.jumpDrawablesToCurrentState()
+        enableDisableBlock(cameraBlock, isChecked)
     }
 
     override fun makeVisible() {
         settingsNestedScrollView.visibility = View.VISIBLE
+    }
+
+    private fun enableDisableBlock(block: ViewGroup, isEnabled: Boolean) {
+        block.alpha = if (isEnabled) 1f else 0.5f
+        enableDisableRecursively(block, isEnabled)
+    }
+
+    private fun enableDisableRecursively(view: View, isEnabled: Boolean) {
+        view.isEnabled = isEnabled
+        view.takeIf { it is ViewGroup }
+            ?.let { it as ViewGroup }
+            ?.let {
+                it.children.forEach { child ->
+                    enableDisableRecursively(child, isEnabled)
+                }
+            }
     }
 
 }
