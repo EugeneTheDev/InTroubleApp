@@ -24,7 +24,7 @@
     <string name="incorrect_folder">Incorrect folder. Choose folder from internal storage</string>
 
     <string name="camera_title">Start camera</string>
-    <string name="camera_description">It\'s highly recommended to turn on sync with Google Photos (or other cloud storage). Thus you could save recordings even if they would be removed on device</string>
+    <string name="camera_description">It\'s highly recommended to turn on sync with Google Photos (or other cloud storage). Thus you could save recordings even if they would be removed from device</string>
 
     <string name="pick_folder_text">Choose directory</string>
 
