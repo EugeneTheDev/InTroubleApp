@@ -50,8 +50,9 @@ class AlertFragment : MvpAppCompatFragment(), AlertView {
             findNavController().navigate(R.id.action_fragmentAlert_to_fragmentSettings)
         }
 
-        alertButton.setOnClickListener {
+        alertButton.setOnLongClickListener {
             alertPresenter.onAlertButtonClick()
+            true
         }
 
         alertPresenter.onCreate()
